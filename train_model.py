@@ -1,5 +1,5 @@
 from keras.layers import ConvLSTM2D, Conv3D
-from keras.models import Sequential
+from keras.models import Sequential, load_model
 from keras.utils import multi_gpu_model
 from keras.callbacks import TensorBoard
 from keras import backend as K
@@ -135,15 +135,21 @@ def build_cache(ghi_log, cache_dir):
 
 
 if __name__ == "__main__":
-
+    '''
     islands = ["kauai", "molokai", "big_east", "big_west", "maui", "niihau"]
 
     data = load_cache(islands, cache_dir="tmp")
+    '''
+
+    data = load_cache(["oahu"], cache_dir="tmp")
 
     shape, X, Y = prep_data(data)
 
-    x_train, x_val, y_train, y_val = train_test_split(X, Y, test_size=0.2)
-    model = build_model(shape, {'filters': 32, 'kernel': 4, 'dropout': 0.2})
+    x, x_test, y, y_test = train_test_split(X, Y, test_size=0.4)
+
+    x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.2)
+
+    model = load_model("model.h5")
     model.summary()
 
     data_gen = daily_generator(x_train, y_train)
@@ -155,7 +161,7 @@ if __name__ == "__main__":
                         validation_steps=len(x_val)
                         )
 
-    model.save("model.h5")
+    model.save("model_01.h5")
 
 
 
