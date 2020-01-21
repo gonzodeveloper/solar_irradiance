@@ -108,7 +108,7 @@ def save_test(x_test, y_test):
 
     x_test = np.expand_dims(x_test, axis=0)
     y_test = np.expand_dims(y_test, axis=0)
-
+    print(x_test.shape)
     shape = x_test.shape
     shape_name = "x_test_shape.pkl"
     with open(shape_name, "wb") as f:
@@ -192,6 +192,8 @@ if __name__ == "__main__":
 
     x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.2)
 
+    save_test(x_test, y_test)
+
     model = load_model("model.h5")
     model.summary()
 
@@ -205,7 +207,6 @@ if __name__ == "__main__":
                         )
 
     model.save("model_01.h5")
-    save_test(x_test, y_test)
 
 
 
