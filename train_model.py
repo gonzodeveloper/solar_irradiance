@@ -5,6 +5,8 @@ from keras.callbacks import TensorBoard
 from keras import backend as K
 from multiprocessing import Pool
 from sklearn.model_selection import train_test_split
+import os
+import pickle
 import pandas as pd
 import numpy as np
 import sherpa
@@ -99,6 +101,41 @@ def prep_data(data):
     return shape, X, Y
 
 
+def save_test(x_test, y_test):
+    # Save test set for later
+    shape = x_test.shape
+    shape_name = "x_test_shape.pkl"
+    with open(shape_name, "wb") as f:
+        pickle.dump(shape, f)
+
+    filename = "x_test.dat"
+    fp = np.memmap(filename, dtype='float16', mode="w+", shape=shape)
+    fp[:] = x_test[:]
+    del fp
+
+    shape = y_test.shape
+    shape_name = "y_test_shape.pkl"
+    with open(shape_name, "wb") as f:
+        pickle.dump(shape, f)
+
+    filename = "y_test.dat"
+    fp = np.memmap(filename, dtype='float16', mode="w+", shape=shape)
+    fp[:] = x_test[:]
+    del fp
+
+
+def load_test():
+    with open("x_test_shape.pkl", "rb") as f:
+        x_shape = pickle.load(f)
+    with open("y_test_shape.pkl", "rb") as f:
+        y_shape = pickle.load(f)
+
+    x_test = np.memmap("x_test.dat", dtype='float16', shape=x_shape)
+    y_test = np.memmap("y_test.dat", dtype='float16', shape=y_shape)
+
+    return x_test, y_test
+
+
 def build_cache(ghi_log, cache_dir):
     # Grid Square for Big Island
     big_east = (19, 20), (-155.5, -154.5)
@@ -134,6 +171,7 @@ def build_cache(ghi_log, cache_dir):
             print("Completed Cacheing: ", r.get())
 
 
+
 if __name__ == "__main__":
     '''
     islands = ["kauai", "molokai", "big_east", "big_west", "maui", "niihau"]
@@ -162,9 +200,7 @@ if __name__ == "__main__":
                         )
 
     model.save("model_01.h5")
-
-
-
+    save_test(x_test, y_test)
 
 
 
