@@ -103,6 +103,12 @@ def prep_data(data):
 
 def save_test(x_test, y_test):
     # Save test set for later
+    x_test = np.array(x_test)
+    y_test = np.array(y_test)
+
+    x_test = np.expand_dims(x_test, axis=0)
+    y_test = np.expand_dims(y_test, axis=0)
+
     shape = x_test.shape
     shape_name = "x_test_shape.pkl"
     with open(shape_name, "wb") as f:
@@ -169,7 +175,6 @@ def build_cache(ghi_log, cache_dir):
 
         for r in results:
             print("Completed Cacheing: ", r.get())
-
 
 
 if __name__ == "__main__":

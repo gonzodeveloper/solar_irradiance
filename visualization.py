@@ -5,55 +5,22 @@ from extract_utils import *
 import os, sys
 
 
-def plot_img(data, file):
-    plt.ioff()
-
-    plt.savefig(file)
-    plt.close()
-
-
-def plot_catalog_imgs(files, folder, dataset, latbounds, lonbounds):
-    if dataset == "GFS":
-        extract = extract_grib
-        variable = "Precipitable water"
-
-    elif dataset == "GHI":
-        extract = extract_nc
-        variable = "GHI"
-
-    else:
-        print("Invalid Dataset: ", dataset, len(dataset), type(dataset))
-
-    for idx, f in enumerate(files):
-        print(f)
-        data = extract(f, variable, latbounds, lonbounds)
-        name = "image{:05d}.png".format(idx)
-        plot_img(data, folder + name)
-
-
 def create_video(name, folder, fps=12):
     os.system("ffmpeg -pattern_type glob -i \"{}*.png\" -r {} -vcodec mpeg4 -y {}{}.mp4".format(folder, fps, folder, name))
 
 
-def read_latlong_args(args):
-    return tuple([int(s) for s in args.split(",")])
+def plot_slice(x, y, save_loc):
+    fig = plt.figure()
+    ax1 = fig.add_subplot(1,2,1)
+    ax1.imshow(x, cmap='hot')
+    ax1.title.set_text('Ground Truth')
 
+    ax2 = fig.add_subplot(1,2,2)
+    ax2.imshow(y, cmap='hot')
+    ax2.title.set_text('Prediction')
+    plt.savefig(save_loc)
 
-def get_datetime(args):
-    args = args.split("/")
-    return datetime(year=int(args[0]), month=int(args[1]), day=int(args[2]))
-
-
-def long_vid(daily_frames):
-    directory = "../visuals/"
-    total = len(daily_frames)
-    for idx_d, day in enumerate(daily_frames):
-        print_progress_bar(idx_d, total)
-        for idx_f, frames in enumerate(day):
-            filename = directory + "img_{:03d}_{:03d}.png".format(idx_d, idx_f)
-            plot_img(frames, filename)
-
-    create_video("all", folder=directory)
+def plot_day(X, Y, save_dir):
 
 
 if __name__ == "__main__":
