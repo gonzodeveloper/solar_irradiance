@@ -1,11 +1,11 @@
 import matplotlib as mpl
-mpl.use('Agg')
 import matplotlib.pyplot as plt
+from keras.models import load_model
 from utils import load_test
-import os, sys
+import os
 
 
-def create_video(name, folder, fps=12):
+def create_video(name, folder, fps=1):
     os.system("ffmpeg -pattern_type glob -i \"{}*.png\" -r {} -vcodec mpeg4 -y {}{}.mp4".format(folder, fps, folder, name))
 
 
@@ -20,29 +20,23 @@ def plot_slice(x, y, save_loc):
     ax2.title.set_text('Prediction')
     plt.savefig(save_loc)
 
-def plot_day(X, Y, save_dir):
 
+def plot_day(X, Y, save_dir):
+    for idx, (x, y) in enumerate(zip(X, Y)):
+
+        filename = os.join(save_dir, "step_{}.png".format(idx))
+        plot_slice(x, y, save_loc=filename)
 
 
 if __name__ == "__main__":
-    usage = "python3 visualization.py [GHI|GFS] [latbounds] [lonbounds] [timestart] [timestop]\n" \
-            "example: \n" \
-            "$ python3 visualization.py GHI 18, -160,-155 2013/02/28  2013/03/14\n"
-    if len(sys.argv) != 6:
-        print(usage)
-        exit(1)
-    dataset = sys.argv[1]
-    latbounds = read_latlong_args(sys.argv[2])
-    lonbounds = read_latlong_args(sys.argv[3])
-    timestart = get_datetime(sys.argv[4])
-    timestop = get_datetime(sys.argv[5])
 
-    catalog = pd.read_csv("catalog.csv", parse_dates=['time_stamp'])
-    mask = (catalog['time_stamp'] > timestart) & (catalog['time_stamp'] < timestop)
+    X, Y = load_test()
+    model = load_model("model_01.h5")
 
-    files = catalog.loc[mask][dataset].dropna().tolist()
-    files = sorted(files)
-    folder = "../visuals/"
+    os.mkdir("imgs", mode="exist_ok")
+    for idx, (x, y) in enumerate(zip(X, Y)):
+        y_pred = model.predict(x)
+        dirname = "img/day_{:03d}/".format(idx)
+        os.mkdir(dirname)
+        plot_day(y, y_pred, save_dir=dirname)
 
-    plot_catalog_imgs(files, folder, dataset, latbounds, lonbounds)
-    create_video("vid", folder)
