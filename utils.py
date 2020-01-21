@@ -117,3 +117,14 @@ def daily_generator(X, Y):
             y = np.expand_dims(y, axis=0)
             yield x, y
 
+
+def load_test():
+    with open("x_test_shape.pkl", "rb") as f:
+        x_shape = pickle.load(f)
+    with open("y_test_shape.pkl", "rb") as f:
+        y_shape = pickle.load(f)
+
+    x_test = np.memmap("x_test.dat", dtype='float16', shape=x_shape)
+    y_test = np.memmap("y_test.dat", dtype='float16', shape=y_shape)
+
+    return x_test, y_test

@@ -102,44 +102,17 @@ def prep_data(data):
 
 
 def save_test(x_test, y_test):
-    # Save test set for later
-    x_test = np.array(x_test)
-    y_test = np.array(y_test)
 
-    x_test = np.expand_dims(x_test, axis=0)
-    y_test = np.expand_dims(y_test, axis=0)
-    print(x_test.shape)
-    shape = x_test.shape
-    shape_name = "x_test_shape.pkl"
-    with open(shape_name, "wb") as f:
-        pickle.dump(shape, f)
+    x_test = [np.expand_dims(x, axis=0) for x in x_test]
+    y_test = [np.expand_dims(y, axis=0) for y in y_test]
 
-    filename = "x_test.dat"
-    fp = np.memmap(filename, dtype='float16', mode="w+", shape=shape)
-    fp[:] = x_test[:]
-    del fp
+    name = "x_test.pkl"
+    with open(name, "wb") as f:
+        pickle.dump(x_test, f)
 
-    shape = y_test.shape
-    shape_name = "y_test_shape.pkl"
-    with open(shape_name, "wb") as f:
-        pickle.dump(shape, f)
-
-    filename = "y_test.dat"
-    fp = np.memmap(filename, dtype='float16', mode="w+", shape=shape)
-    fp[:] = x_test[:]
-    del fp
-
-
-def load_test():
-    with open("x_test_shape.pkl", "rb") as f:
-        x_shape = pickle.load(f)
-    with open("y_test_shape.pkl", "rb") as f:
-        y_shape = pickle.load(f)
-
-    x_test = np.memmap("x_test.dat", dtype='float16', shape=x_shape)
-    y_test = np.memmap("y_test.dat", dtype='float16', shape=y_shape)
-
-    return x_test, y_test
+    name = "y_test.pkl"
+    with open(name, "wb") as f:
+        pickle.dump(y_test, f)
 
 
 def build_cache(ghi_log, cache_dir):

@@ -1,7 +1,7 @@
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
-from extract_utils import *
+from utils import load_test
 import os, sys
 
 
@@ -21,6 +21,7 @@ def plot_slice(x, y, save_loc):
     plt.savefig(save_loc)
 
 def plot_day(X, Y, save_dir):
+
 
 
 if __name__ == "__main__":
